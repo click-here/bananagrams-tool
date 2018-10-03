@@ -10,6 +10,8 @@ def in_joined_hand(row, joined_hand):
 def sort_string(row):
     return ''.join(sorted(row))
 
+def remove_not_in_hand(row):
+    pass
 
 df = pd.read_csv('EOWL.csv',header=None).dropna()
 
@@ -33,14 +35,23 @@ def play_hand():
 
     ##df['sorted-hash'] = df['sorted'].apply(hash)
 
-    df['in-hand'] = df['sorted'].apply(in_joined_hand, args=(joined_hand,))
+    ##    '|'.join(set(list(joined_hand)))
+    df['in-hand-v2'] = df['sorted'].str.replace('^[' + '|'.join(set(list(joined_hand)))+']','')
+    df['in-hand-v2'] = df['sorted'].apply(in_joined_hand, args=(joined_hand,))
 
-    df[df['in-hand']==True][['words','sorted']]
+    df['in-hand-v2'] = df['sorted'].apply(in_joined_hand, args=(joined_hand,))
 
-    return df[df['in-hand']==True]['words'].tolist()
+    df[df['in-hand-v2']==True][['words','sorted']]
+
+    return df[df['in-hand-v2']==True]['words'].tolist()
+
+play_hand()
 
 for i in range(1000):
+    if i % 25 == 0:
+        print(i)
     hands += play_hand()
+
 
 hands_df = pd.DataFrame({'WordsPlayed':hands})
 
